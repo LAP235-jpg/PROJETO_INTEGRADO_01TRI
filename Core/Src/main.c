@@ -141,6 +141,7 @@ senha = (rand()%10) + 1;
 ST7735_Init();
 tela(x);
 DrawLines(x);
+Drawalunos();
 
   /* USER CODE END 2 */
 
