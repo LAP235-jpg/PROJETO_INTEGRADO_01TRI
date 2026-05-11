@@ -29,8 +29,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
+typedef enum{
+	AULA,
+	MENU,
+	LOGIN,
+    DEFINIR,
+	ALUNOS,
+	BEGINE
+}estado;
+/* USER CODE END PTD */ 
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
@@ -50,8 +57,13 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 int x = 0;
+int alunosquant = 0;
+int alunos = 0;
 int senha = 0;
+int banheiro = 0;
 bool altsenha = false;
+estado estadoAtual = BEGINE;
+estado ultimoEstado = -1;
 
 /* USER CODE END PV */
 
@@ -65,45 +77,186 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void tela()
-{
-    // large block of text
+void telalogin(){
+ DrawLines(x);
 
-   extern bool altsenha;
-	if (altsenha = true){
-
-	Drawmenu();
+    if(right == 0)
+    {
+        x++;
+        HAL_Delay(150);
     }
-	else{
-	DrawLines();
-	}
+
+    if(left == 0)
+    {
+        x--;
+        HAL_Delay(150);
+    }
+
+    if(up == 0)
+    {
+        if(x == senha)
+        {
+           estadoAtual = DEFINIR;
+        }
+
+        HAL_Delay(150);
+    }
 
 
 }
+void telainicial()
 
+{
+
+  ST7735_WriteString(0,0, "    BEM VINDO  " , Font_11x18, WHITE, GREEN);
+  ST7735_WriteString(0,25, "    AO SISTEMA DE CONTROLE DE ACESSO  " , Font_7x10, WHITE, GREEN);
+  ST7735_WriteString(0,50, "    PRESSIONE QUALQUER BOTAO PARA INICIAR  " , Font_7x10, WHITE, GREEN);
+
+ if(right == 0 || left == 0 || up == 0 || down == 0)
+ {
+     estadoAtual = LOGIN;
+     HAL_Delay(150);
+ }
+}
+void teladefinir()
+{
+
+  Drawalunos(alunosquant);
+    if(right == 0)
+    {
+        alunosquant++;
+        HAL_Delay(150);
+    }
+
+    if(left == 0)
+    {
+        alunosquant--;
+        HAL_Delay(150);
+    }
+
+    if(up == 0)
+    {
+        estadoAtual = MENU;
+        HAL_Delay(150);
+    }
+}
+void telaalunos()
+{
+  DrawAula(alunos);
+
+    if(right == 0)
+    {
+        alunos++;
+        HAL_Delay(150);
+    }
+
+    if(left == 0)
+    {
+        alunos--;
+        HAL_Delay(150);
+    }
+
+    if(up == 0)
+    {
+        estadoAtual = AULA;
+        HAL_Delay(150);
+    }
+
+}
+void telabanheiro()
+{
+  Drawnbanheiro(banheiro);
+
+    if(right == 0)
+    {
+        banheiro++;
+        HAL_Delay(150);
+    }
+
+    if(left == 0)
+    {
+        banheiro--;
+        HAL_Delay(150);
+    }
+    if(banheiro > 3)
+    {
+        banheiro = 0;
+    }
+
+    if(up == 0)
+    {
+        estadoAtual = AULA;
+        HAL_Delay(150);
+    }
+}
+void telamenu()
+{
+  Drawmenu();
+
+    if(up == 0)
+    {
+        estadoAtual = DEFINIR;
+        HAL_Delay(150);
+    }
+    if(down == 0)
+    {
+        estadoAtual = AULA;
+        HAL_Delay(150);
+    }
+}
+
+
+void DrawAula(alunos, alunosquant)
+{
+	char alu[20];
+
+	sprintf(alu, "DE", alunos);
+
+  ST7735_WriteString(0,0, "    AULA INICIADA  " , Font_11x18, WHITE, GREEN);
+  ST7735_WriteString(0,25, alu, Font_7x10, WHITE, GREEN);
+  ST7735_WriteString(0,50, alunosquant , Font_7x10, WHITE, GREEN);
+}
 void DrawLines(x)
 {
 char c[10]={0};
 c[0]=x + '0';
 
-	ST7735_FillScreen(WHITE);
+
 		ST7735_WriteString(0,0, "    LOGGIN   " , Font_11x18, WHITE, GREEN);
 		ST7735_WriteString(40,25, c , Font_7x10, BLACK, WHITE);
 		ST7735_WriteString(0,50, "pa12 = + pa10 = -" , Font_7x10, BLACK, WHITE);
 		ST7735_WriteString(0,65, "pa9 = NEXT PA11 = CONF" , Font_7x10, BLACK, WHITE);
 
 }
+void Drawnbanheiro(banheiro){
+	char ban[20];
+
+	sprintf(ban, "%d/3", banheiro);
+
+  ST7735_WriteString(0,0, "    BANHEIRO  " , Font_11x18, WHITE, GREEN);
+  ST7735_WriteString(0,25, ban, Font_7x10, WHITE, GREEN);
+  
+}
 void Drawmenu()
 {
-	ST7735_FillScreen(GREEN);
-	ST7735_WriteString(0,0, "    MENU  " , Font_11x18, WHITE, GREEN);
-	ST7735_WriteString(0,25, "    ALUNOS  " , Font_11x18, WHITE, GREEN);
-	ST7735_WriteString(0,35, "    AULA  " , Font_11x18, WHITE, GREEN);
-	ST7735_WriteString(0,25, "    ALUNOS  " , Font_11x18, WHITE, GREEN);
+ 	ST7735_WriteString(0,0, "    MENU  " , Font_7x10, WHITE, GREEN);
+	ST7735_WriteString(0,25, "    ALUNOS  " , Font_7x10, WHITE, GREEN);
+	ST7735_WriteString(0,35, "    AULA  " , Font_7x10, WHITE, GREEN);
+	ST7735_WriteString(0,45, "    BANHEIRO  " , Font_7x10, WHITE, GREEN);
+  ST7735_WriteString(0,65, "    RELATORIO  " , Font_7x10, WHITE, GREEN);
 }
-void Drawalunos(){
-	ST7735_WriteString(0,0, "    DEFINA A QUANTIDADE DE ALUNOS   " , Font_7x10, WHITE, GREEN);
+void Drawalunos(alunosquant)
 
+{
+	  char alunosq[3];
+
+	    alunosq[0] = (alunosquant / 10) + '0';
+	    alunosq[1] = (alunosquant % 10) + '0';
+	    alunosq[2] = '\0';
+
+	ST7735_WriteString(0,0, "DEFINA A QUANTIDADE DE ALUNOS   " , Font_7x10, BLACK, WHITE);
+  ST7735_WriteString(0,25, alunosq , Font_7x10, BLACK, WHITE);
+  ST7735_WriteString(20,25, "/99", Font_7x10, BLACK, WHITE);
 }
 /* USER CODE END 0 */
 
@@ -117,7 +270,7 @@ int main(void)
 
   /* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+  /* MCU Configuration----------------------------------------------------r   ----*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
@@ -139,7 +292,6 @@ senha = (rand()%10) + 1;
   /* USER CODE BEGIN 2 */
 
 ST7735_Init();
-tela(x);
 DrawLines(x);
 Drawalunos();
 
@@ -150,18 +302,54 @@ Drawalunos();
 
   while (1)
   {
+	  if(estadoAtual != ultimoEstado)
+	     {
+	         switch(estadoAtual)
+	         {
+	         case BEGINE:
+	         	                 ST7735_FillScreen(WHITE);
+	         	                 break;
+	             case LOGIN:
+	                 ST7735_FillScreen(WHITE);
+	                 break;
+	             case DEFINIR:
+	            	  ST7735_FillScreen(WHITE);
+	            	  break;
 
-    	  if (up==0){
-    	      	  x++;
-    	      	  tela(x);
-    	        }
-    	        if(down==0){
-    	      	  x--;
-    	      	  tela(x);
-    	        }
+	             case MENU:
+	                 ST7735_FillScreen(WHITE);
+	                 break;
 
+	             case ALUNOS:
+	                 ST7735_FillScreen(WHITE);
+	                 break;
+	         }
 
+	         ultimoEstado = estadoAtual;
+	     }
 
+	     switch(estadoAtual)
+	     {
+	     case BEGINE:
+	    	 telainicial();
+	    	 break;
+	         case LOGIN:
+	             telalogin();
+	             break;
+
+	         case MENU:
+	             telamenu();
+	             break;
+
+	         case ALUNOS:
+	             telaalunos();
+	             break;
+
+	         case DEFINIR:
+	         teladefinir();
+	         	 break;
+
+	     }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

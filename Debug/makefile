@@ -55,8 +55,8 @@ all: main-build
 main-build: PROJINTE.elf secondary-outputs
 
 # Tool invocations
-PROJINTE.elf: $(OBJS) $(USER_OBJS) C:\stm32-2026\PROJINTE\STM32F103C8TX_FLASH.ld
-	arm-none-eabi-gcc -o "PROJINTE.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\stm32-2026\PROJINTE\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PROJINTE.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+PROJINTE.elf: $(OBJS) $(USER_OBJS) C:\Users\LUIGI\Desktop\PROJETO_INTEGRADO_01TRI\STM32F103C8TX_FLASH.ld
+	arm-none-eabi-gcc -o "PROJINTE.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\LUIGI\Desktop\PROJETO_INTEGRADO_01TRI\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PROJINTE.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
