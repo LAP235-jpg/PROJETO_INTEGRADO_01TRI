@@ -36,7 +36,9 @@ typedef enum{
 	LOGIN,
     DEFINIR,
 	BEGINE,
-	RELATORIO
+	RELATORIO,
+	ERRO,
+	ERRO2
 }estado;
 /* USER CODE END PTD */ 
 
@@ -63,7 +65,7 @@ int alunos = 0;
 int saida = 0;
 int senha = 0;
 int banheiro = 0;
-bool altsenha = false;
+int banheiro2 = 0;
 estado estadoAtual = BEGINE;
 estado ultimoEstado = -1;
 
@@ -97,6 +99,12 @@ void telalogin()
         x--;
 
     }
+    if(x < 0){
+    	x = 0;
+    }
+    if(x > 10){
+    	x = 10;
+    }
 
     if(up == 0)
     {
@@ -104,6 +112,11 @@ void telalogin()
         {
            estadoAtual = DEFINIR;
         }
+        else {
+          estadoAtual = ERRO2;
+          x = 0;
+        }
+
 
 
     }
@@ -139,11 +152,11 @@ void teladefinir()
         alunosquant--;
         HAL_Delay(150);
     }
-    if(alunos > 99){
-    	alunos = 99;
+    if(alunosquant > 99){
+    	alunosquant = 99;
     }
-    if(alunos < 0){
-    	alunos = 0;
+    if(alunosquant < 0){
+    	alunosquant = 0;
     }
 
     if(up == 0)
@@ -182,14 +195,13 @@ void telaaula()
 
 
     if(alunos > alunosquant){
-    	alunos = 0;
+    	estadoAtual = ERRO;
     }
     if(alunos < 0){
-    alunos = alunosquant;
+    alunos = 0;
     }
     if(banheiro > 3){
-    	saida--;
-    	banheiro = 3;
+    	estadoAtual = ERRO;
     }
     if(banheiro < 0){
     	banheiro = 0;
@@ -207,6 +219,7 @@ void telaaula()
 
 }
 void telarelatorio()
+
 {
   Drawmenu();
 
@@ -215,7 +228,21 @@ void telarelatorio()
   }
 
 }
-
+void telaerro2(){
+	Drawerro2();
+	if(right == 0 || left == 0 || up == 0 || down == 0){
+		estadoAtual = LOGIN;
+	}
+}
+void telaerro(){
+ Drawerro();
+		if(right == 0 || left == 0 || up == 0 || down == 0){
+		alunos = 0;
+		banheiro = 0;
+		saida = 0;
+		estadoAtual = AULA;
+		}
+}
 /*DESENHO DAS TELAS*/
 void DrawAula()
 {
@@ -234,20 +261,27 @@ void DrawAula()
      ban[0]=banheiro + '0';
 
   ST7735_WriteString(0,0, "AULA INICIADA" , Font_11x18, WHITE, BLACK);
-  ST7735_WriteString(0,25, alu, Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(25,25, alunosq , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(15, 25,"/",Font_7x10,WHITE, BLACK);
-  ST7735_WriteString(75 ,60, ban , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(90, 60,"/3" , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(80,25, alu, Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(105,25, alunosq , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(95, 25,"/",Font_7x10,WHITE, BLACK);
+  ST7735_WriteString(00, 25,"NUM.ALUNOS:",Font_7x10,WHITE, BLACK);
+  ST7735_WriteString(00, 40,"ALU.FORA:",Font_7x10,WHITE, BLACK);
+
+  ST7735_WriteString(75 ,40, ban , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(90, 40,"/3" , Font_7x10, WHITE, BLACK);
 }
 void DrawLines()
 {
-char c[10]={0};
-c[0]=x + '0';
+	char c[3];
+
+		    c[0] = (x / 10) + '0';
+		    c[1] = (x % 10) + '0';
+		    c[2] = '\0';
 
 
 		ST7735_WriteString(0,0, "    LOGGIN   " , Font_11x18, WHITE, GREEN);
-		ST7735_WriteString(40,25, c , Font_7x10, BLACK, WHITE);
+		ST7735_WriteString(55,40, c , Font_16x26, WHITE, BLACK);
+		ST7735_WriteString(10,70, "pa9 + pa11 -" , Font_7x10, WHITE, BLACK);
 
 }
 void Drawmenu()
@@ -273,6 +307,15 @@ void Drawmenu()
 
 
 }
+void Drawerro2(){
+	ST7735_WriteString(0,0, "SENHA" , Font_11x18, WHITE, RED);
+	ST7735_WriteString(0,20, "INCORRETA" , Font_11x18, WHITE, RED);
+}
+void Drawerro(){
+	ST7735_WriteString(0,0, "ERRO " , Font_16x26, WHITE, RED);
+	ST7735_WriteString(0,27, "QUANTIDADE DE ALUNOS OU BANHEIRO EXEDIDA" , Font_7x10,WHITE, RED);
+	ST7735_WriteString(0,50, "PRESSIONE QUALQUER TECLA PARA RETORNAR" , Font_7x10,WHITE, RED);
+}
 void Drawalunos()
 
 {
@@ -282,9 +325,9 @@ void Drawalunos()
 	    alunosq[1] = (alunosquant % 10) + '0';
 	    alunosq[2] = '\0';
 
-	ST7735_WriteString(0,0, "DEFINA A QUANTIDADE DE ALUNOS   " , Font_7x10, BLACK, WHITE);
-  ST7735_WriteString(0,25, alunosq , Font_7x10, BLACK, WHITE);
-  ST7735_WriteString(20,25, "/99", Font_7x10, BLACK, WHITE);
+	ST7735_WriteString(0,0, "DEFINA A QUANTIDADE DE ALUNOS   " , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(0,30, alunosq , Font_11x18, WHITE, BLACK);
+  ST7735_WriteString(20,30, "/99", Font_11x18, WHITE, BLACK);
 }
 /* USER CODE END 0 */
 
@@ -330,18 +373,19 @@ Drawalunos();
 
   while (1)
   {
+
 	  if(estadoAtual != ultimoEstado)
 	     {
 	         switch(estadoAtual)
 	         {
 	         case BEGINE:
-	         	                 ST7735_FillScreen(BLACK);
-	         	                 break;
+	         ST7735_FillScreen(BLACK);
+	         break;
 	             case LOGIN:
-	                 ST7735_FillScreen(WHITE);
+	                 ST7735_FillScreen(BLACK);
 	                 break;
 	             case DEFINIR:
-	            	  ST7735_FillScreen(WHITE);
+	            	  ST7735_FillScreen(BLACK);
 	            	  break;
 
 	             case AULA:
@@ -351,6 +395,12 @@ Drawalunos();
 	             case RELATORIO:
 	            	 ST7735_FillScreen(BLACK);
 	            	 break;
+	             case ERRO:
+	             ST7735_FillScreen(RED);
+	             break;
+	             case ERRO2:
+	             	 ST7735_FillScreen(RED);
+	             	     break;
 	         }
 
 	         ultimoEstado = estadoAtual;
@@ -362,6 +412,7 @@ Drawalunos();
 	    	 telainicial();
 	    	 break;
 	         case LOGIN:
+	        	 senha;
 	             telalogin();
 	             break;
 
@@ -376,7 +427,12 @@ Drawalunos();
 	         case DEFINIR:
 	         teladefinir();
 	         	 break;
-
+	         case ERRO:
+	         telaerro();
+	         break;
+	         case ERRO2:
+	         telaerro2();
+	         break;
 	     }
     /* USER CODE END WHILE */
 
