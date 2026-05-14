@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "st7735\st7735.h"
 #include <stdbool.h>
+#include <stdlib.h>
 #include <time.h>
 /* USER CODE END Includes */
 
@@ -83,17 +84,18 @@ static void MX_SPI1_Init(void);
 void telalogin()
 {
  DrawLines(x);
+ senha = (rand()%10) + 1;
 
     if(right == 0)
     {
         x++;
-        HAL_Delay(150);
+
     }
 
     if(left == 0)
     {
         x--;
-        HAL_Delay(150);
+
     }
 
     if(up == 0)
@@ -103,7 +105,7 @@ void telalogin()
            estadoAtual = DEFINIR;
         }
 
-        HAL_Delay(150);
+
     }
 
 
@@ -112,14 +114,14 @@ void telainicial()
 
 {
 
-  ST7735_WriteString(0,0, "    BEM VINDO  " , Font_11x18, WHITE, GREEN);
-  ST7735_WriteString(0,25, "    AO SISTEMA DE CONTROLE DE ACESSO  " , Font_7x10, WHITE, GREEN);
-  ST7735_WriteString(0,50, "    PRESSIONE QUALQUER BOTAO PARA INICIAR  " , Font_7x10, WHITE, GREEN);
+  ST7735_WriteString(0,0, "   BEM VINDO   " , Font_11x18, WHITE, GREEN);
+  ST7735_WriteString(0,25, "    AO SISTEMA DE CONTROLE DE ACESSO  " , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(0,50, "    PRESSIONE QUALQUER BOTAO PARA INICIAR  " , Font_7x10, WHITE, BLACK);
 
  if(right == 0 || left == 0 || up == 0 || down == 0)
  {
      estadoAtual = LOGIN;
-     HAL_Delay(150);
+
  }
 }
 void teladefinir()
@@ -136,6 +138,12 @@ void teladefinir()
     {
         alunosquant--;
         HAL_Delay(150);
+    }
+    if(alunos > 99){
+    	alunos = 99;
+    }
+    if(alunos < 0){
+    	alunos = 0;
     }
 
     if(up == 0)
@@ -170,8 +178,29 @@ void telaaula()
         HAL_Delay(150);
         }
 
-    if(up == 0 || right == 0)
+
+
+
+    if(alunos > alunosquant){
+    	alunos = 0;
+    }
+    if(alunos < 0){
+    alunos = alunosquant;
+    }
+    if(banheiro > 3){
+    	saida--;
+    	banheiro = 3;
+    }
+    if(banheiro < 0){
+    	banheiro = 0;
+    }
+
+
+
+    if(up == 0 && right == 0)
     {
+    	saida --;
+    	alunos --;
         estadoAtual = RELATORIO;
         HAL_Delay(150);
     }
@@ -190,13 +219,26 @@ void telarelatorio()
 /*DESENHO DAS TELAS*/
 void DrawAula()
 {
+	char alunosq[3];
 
-  ST7735_WriteString(0,0, "    AULA INICIADA  " , Font_11x18, WHITE, BLACK);
-  ST7735_WriteString(0,25, alunos, Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(0,50, alunosquant , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(0,75, "BANHEIRO:"  , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(75 ,75, banheiro , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(90, 75,"/3" , Font_7x10, WHITE, BLACK);
+		    alunosq[0] = (alunosquant / 10) + '0';
+		    alunosq[1] = (alunosquant % 10) + '0';
+		    alunosq[2] = '\0';
+
+	 char alu[3];
+
+		    	    alu[0] = (alunos / 10) + '0';
+		    	    alu[1] = (alunos % 10) + '0';
+		    	    alu[2] = '\0';
+     char ban[10]={0};
+     ban[0]=banheiro + '0';
+
+  ST7735_WriteString(0,0, "AULA INICIADA" , Font_11x18, WHITE, BLACK);
+  ST7735_WriteString(0,25, alu, Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(25,25, alunosq , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(15, 25,"/",Font_7x10,WHITE, BLACK);
+  ST7735_WriteString(75 ,60, ban , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(90, 60,"/3" , Font_7x10, WHITE, BLACK);
 }
 void DrawLines()
 {
@@ -212,11 +254,22 @@ void Drawmenu()
 {
 	int falta = alunosquant - alunos;
 
- 	ST7735_WriteString(0,10, "    RELATORIO  " , Font_7x10, WHITE, BLACK);
- 	ST7735_WriteString(0,30, "FALTAS", Font_7x10, WHITE, BLACK);
- 	ST7735_WriteString(0,45, falta , Font_7x10, WHITE, BLACK);
- 	ST7735_WriteString(0,60, "N DE SAIDAS" , Font_7x10, WHITE, BLACK);
- 	ST7735_WriteString(0,45, saida , Font_7x10, WHITE, BLACK);
+	char fal[3];
+
+			    fal[0] = (falta / 10) + '0';
+			    fal[1] = (falta % 10) + '0';
+			    fal[2] = '\0';
+    char sai[3];
+
+			    		    sai[0] = (saida / 10) + '0';
+			    		    sai[1] = (saida % 10) + '0';
+			    		    sai[2] = '\0';
+
+ 	ST7735_WriteString(0,10, "RELATORIO  " , Font_11x18, WHITE, BLACK);
+ 	ST7735_WriteString(0,40, "FALTAS:", Font_7x10, WHITE, BLACK);
+ 	ST7735_WriteString(50,40, fal , Font_7x10, WHITE, BLACK);
+ 	ST7735_WriteString(0,55, "N DE SAIDAS:" , Font_7x10, WHITE, BLACK);
+ 	ST7735_WriteString(90,55, sai , Font_7x10, WHITE, BLACK);
 
 
 }
@@ -251,7 +304,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-senha = (rand()%10) + 1;
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -282,7 +335,7 @@ Drawalunos();
 	         switch(estadoAtual)
 	         {
 	         case BEGINE:
-	         	                 ST7735_FillScreen(WHITE);
+	         	                 ST7735_FillScreen(BLACK);
 	         	                 break;
 	             case LOGIN:
 	                 ST7735_FillScreen(WHITE);
@@ -292,11 +345,11 @@ Drawalunos();
 	            	  break;
 
 	             case AULA:
-	                 ST7735_FillScreen(WHITE);
+	                 ST7735_FillScreen(BLACK);
 	                 break;
 
 	             case RELATORIO:
-	            	 ST7735_FillScreen(WHITE);
+	            	 ST7735_FillScreen(BLACK);
 	            	 break;
 	         }
 
