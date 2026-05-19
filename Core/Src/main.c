@@ -64,6 +64,7 @@ int alunosquant = 0;
 int alunos = 0;
 int saida = 0;
 int senha = 0;
+int senhatentativa = 0;
 int banheiro = 0;
 int banheiro2 = 0;
 estado estadoAtual = BEGINE;
@@ -85,8 +86,8 @@ static void MX_SPI1_Init(void);
 /*TELAS*/
 void telalogin()
 {
- DrawLines(x);
- senha = (rand()%10) + 1;
+ DrawLines();
+
 
     if(right == 0)
     {
@@ -105,7 +106,10 @@ void telalogin()
     if(x > 10){
     	x = 10;
     }
-
+     if(up == 0 && senhatentativa == 3){
+    	 senhatentativa = 0;
+    	 estadoAtual = ERRO2;
+     }
     if(up == 0)
     {
         if(x == senha)
@@ -113,8 +117,7 @@ void telalogin()
            estadoAtual = DEFINIR;
         }
         else {
-          estadoAtual = ERRO2;
-          x = 0;
+          senhatentativa ++;
         }
 
 
@@ -129,7 +132,7 @@ void telainicial()
 
   ST7735_WriteString(0,0, "   BEM VINDO   " , Font_11x18, WHITE, GREEN);
   ST7735_WriteString(0,25, "    AO SISTEMA DE CONTROLE DE ACESSO  " , Font_7x10, WHITE, BLACK);
-  ST7735_WriteString(0,50, "    PRESSIONE QUALQUER BOTAO PARA INICIAR  " , Font_7x10, WHITE, BLACK);
+  ST7735_WriteString(0,50, "PRESSIONE QUALQUER BOTAO PARA INICIAR " , Font_7x10, WHITE, BLACK);
 
  if(right == 0 || left == 0 || up == 0 || down == 0)
  {
@@ -278,10 +281,14 @@ void DrawLines()
 		    c[1] = (x % 10) + '0';
 		    c[2] = '\0';
 
+		    char tent[10]={0};
+		     tent[0]=senhatentativa + '0';
 
 		ST7735_WriteString(0,0, "    LOGGIN   " , Font_11x18, WHITE, GREEN);
 		ST7735_WriteString(55,40, c , Font_16x26, WHITE, BLACK);
-		ST7735_WriteString(10,70, "pa9 + pa11 -" , Font_7x10, WHITE, BLACK);
+		ST7735_WriteString(20,70, "/3" , Font_7x10, WHITE, BLACK);
+		ST7735_WriteString(5,70, tent , Font_7x10, WHITE, BLACK);
+
 
 }
 void Drawmenu()
@@ -354,7 +361,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-srand(time(NULL));
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -380,9 +387,11 @@ Drawalunos();
 	         {
 	         case BEGINE:
 	         ST7735_FillScreen(BLACK);
+
 	         break;
 	             case LOGIN:
 	                 ST7735_FillScreen(BLACK);
+
 	                 break;
 	             case DEFINIR:
 	            	  ST7735_FillScreen(BLACK);
@@ -410,9 +419,11 @@ Drawalunos();
 	     {
 	     case BEGINE:
 	    	 telainicial();
+
 	    	 break;
 	         case LOGIN:
-	        	 senha;
+	        	 srand(HAL_GetTick());
+	        	 senha = (rand()%10) + 1;
 	             telalogin();
 	             break;
 
